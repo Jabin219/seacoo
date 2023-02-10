@@ -1,0 +1,23 @@
+name: Portal CI
+
+on:
+  pull_request:
+    branches:
+      - dev
+      - main
+
+jobs:
+  build:
+    name: "Lint and test portal"
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: portal
+    steps:
+      - uses: actions/checkout@v2
+      - name: Install modules
+        run: yarn
+      - name: Run ESLint && Typescript checks
+        run: yarn lint
+      - name: Run test
+        run: yarn test

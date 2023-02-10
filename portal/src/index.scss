@@ -1,0 +1,230 @@
+@import url('https://fonts.googleapis.com/css2?family=Montserrat:wght@100;300;400;500;600&display=swap');
+
+html,
+body,
+div,
+span,
+applet,
+object,
+iframe,
+h1,
+h2,
+h3,
+h4,
+h5,
+h6,
+p,
+blockquote,
+pre,
+a,
+abbr,
+acronym,
+address,
+big,
+cite,
+code,
+del,
+dfn,
+em,
+img,
+ins,
+kbd,
+q,
+s,
+samp,
+small,
+strike,
+strong,
+sub,
+sup,
+tt,
+var,
+b,
+u,
+i,
+center,
+dl,
+dt,
+dd,
+ol,
+ul,
+li,
+fieldset,
+form,
+label,
+legend,
+table,
+caption,
+tbody,
+tfoot,
+thead,
+tr,
+th,
+td,
+article,
+aside,
+canvas,
+details,
+embed,
+figure,
+figcaption,
+footer,
+header,
+hgroup,
+menu,
+nav,
+output,
+ruby,
+section,
+summary,
+time,
+mark,
+audio,
+video {
+	margin: 0;
+	padding: 0;
+}
+
+body {
+	-webkit-font-smoothing: antialiased;
+	-moz-osx-font-smoothing: grayscale;
+
+	.MuiDialog-root {
+		.MuiDialogActions-root {
+			button {
+				padding: 0;
+				min-width: 0;
+			}
+		}
+		.MuiDialogTitle-root {
+			padding: 0 50px;
+			.dialog-title-container {
+				img {
+					display: block;
+					margin: 0 auto;
+					height: 42px;
+					margin-bottom: 20px;
+				}
+				.MuiTypography-root {
+					display: block;
+					max-width: 258px;
+					text-align: center;
+					font-size: 14px;
+					margin-bottom: 20px;
+				}
+			}
+		}
+
+		.dialog-title-container-ali {
+			img {
+				width: 190px;
+			}
+		}
+
+		.dialog-title-container-wechat {
+			img {
+				width: 218px;
+			}
+		}
+
+		.qr-code-container {
+			padding-bottom: 40px;
+
+			svg {
+				display: block;
+				margin: 0 auto;
+			}
+		}
+	}
+}
+
+#root {
+	min-width: 1280px;
+}
+
+.App {
+	margin: 0 auto;
+	position: relative;
+	white-space: 'pre-wrap';
+
+	-webkit-text-size-adjust: none;
+}
+
+code {
+	font-family: source-code-pro, Menlo, Monaco, Consolas, 'Courier New',
+		monospace;
+}
+
+.title,
+.label,
+.caption {
+	font-family: 'Montserrat';
+	color: #4d4d4e;
+}
+
+.MuiButton-root.MuiButtonBase-root,
+.MuiTextField-root .MuiOutlinedInput-root {
+	border-radius: 0;
+}
+
+.StripeElement {
+	display: block;
+	margin: 10px 0 20px 0;
+	max-width: 100%;
+	padding: 16px 14px;
+	box-shadow: rgba(50, 50, 93, 0.14902) 0px 1px 3px,
+		rgba(0, 0, 0, 0.0196078) 0px 1px 0px;
+	border-radius: 3px;
+	background: white;
+}
+
+.StripeElement--focus {
+	box-shadow: rgba(50, 50, 93, 0.109804) 0px 4px 6px,
+		rgba(0, 0, 0, 0.0784314) 0px 1px 3px;
+	-webkit-transition: all 150ms ease;
+	transition: all 150ms ease;
+}
+
+.stripe_card-error {
+	position: absolute;
+	width: 40%;
+	bottom: 44px;
+	left: 42px;
+	color: #e02020;
+	font-size: 16px;
+	line-height: 20px;
+	margin-top: 12px;
+	text-align: center;
+}
+
+@media all {
+	.pageBreak {
+		display: none;
+	}
+}
+
+@media print {
+	html,
+	body {
+		height: initial !important;
+		overflow: initial !important;
+		-webkit-print-color-adjust: exact;
+	}
+}
+
+@media print {
+	.pageBreak {
+		display: block;
+		page-break-after: always;
+		position: relative;
+	}
+}
+
+@page {
+	margin: 0.5cm 0;
+}
+
+a,
+span {
+	font-family: 'Montserrat';
+}

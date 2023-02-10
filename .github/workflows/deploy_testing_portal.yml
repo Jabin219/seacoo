@@ -1,0 +1,122 @@
+name: GitHub Actions Build and Deploy TO AWS-S3
+
+on:
+  push:
+    branches:
+      - testing
+jobs:
+  deploy_seacoo_portal:
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: portal
+    steps:
+      - uses: actions/checkout@v2
+      - name: Install
+        run: |
+          yarn install
+      - name: Build
+        run: |
+          yarn build
+        env:
+          REACT_APP_DOMAIN_NAME: 'seacoo'
+          REACT_APP_SERVER_URL: 'https://test.api.seacoo.com/'
+          REACT_APP_STRIPE_PUB_KEY: 'pk_test_51HZfvzKeRgkQj9wLyMb32ZVIzUdcIAfBONKm2JodjMkffRIuXh3vWtX8VSzv5CWQRn8s2Yh0AGwyz02qc4xec7hr00hr7skOcK'
+          REACT_APP_PAYPAL_CLIENT_ID: 'AXHIZFFdYRpZNp9uAVmaAeEkTQavEP3xfjjLy7wVA1letAlFOKQ-XpMmxaLVWtNkQx7npwSlDbwAsH_o'
+          REACT_APP_PAYPAL_CLIENT_ID_SANDBOX: 'Ac_5qjkTRBKITOVDzVyasvyO9LYyDvDhe7ZpTd3SSSRat_4go2_O29ncdkYgIh59IX4MPuaKWIH0zixg'
+      - name: Deploy to S3
+        uses: jakejarvis/s3-sync-action@master
+        with:
+          args: --acl public-read --follow-symlinks --delete
+        env:
+          AWS_S3_BUCKET: 'test.seacoo.com'
+          AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          AWS_REGION: 'ca-central-1'
+          SOURCE_DIR: './portal/build'
+
+  deploy_beche_portal:
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: portal
+    steps:
+      - uses: actions/checkout@v2
+      - name: Install
+        run: |
+          yarn install
+      - name: Build
+        run: |
+          yarn build
+        env:
+          REACT_APP_DOMAIN_NAME: 'beche'
+          REACT_APP_SERVER_URL: 'https://test.api.seacoo.com/'
+          REACT_APP_STRIPE_PUB_KEY: 'pk_test_51HZfvzKeRgkQj9wLyMb32ZVIzUdcIAfBONKm2JodjMkffRIuXh3vWtX8VSzv5CWQRn8s2Yh0AGwyz02qc4xec7hr00hr7skOcK'
+          REACT_APP_PAYPAL_CLIENT_ID: 'AXHIZFFdYRpZNp9uAVmaAeEkTQavEP3xfjjLy7wVA1letAlFOKQ-XpMmxaLVWtNkQx7npwSlDbwAsH_o'
+          REACT_APP_PAYPAL_CLIENT_ID_SANDBOX: 'Ac_5qjkTRBKITOVDzVyasvyO9LYyDvDhe7ZpTd3SSSRat_4go2_O29ncdkYgIh59IX4MPuaKWIH0zixg'
+      - name: Deploy to S3
+        uses: jakejarvis/s3-sync-action@master
+        with:
+          args: --acl public-read --follow-symlinks --delete
+        env:
+          AWS_S3_BUCKET: 'test.shop.beche.ca'
+          AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          AWS_REGION: 'ca-central-1'
+          SOURCE_DIR: './portal/build'
+
+  deploy_seacoo_cn_portal:
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: portal
+    steps:
+      - uses: actions/checkout@v2
+      - name: Install
+        run: |
+          yarn install
+      - name: Build
+        run: |
+          yarn build
+        env:
+          REACT_APP_DOMAIN_NAME: 'seacoo-cn'
+          REACT_APP_SERVER_URL: 'https://test.api.seacoo.com/'
+          REACT_APP_STRIPE_PUB_KEY: 'pk_test_51HZfvzKeRgkQj9wLyMb32ZVIzUdcIAfBONKm2JodjMkffRIuXh3vWtX8VSzv5CWQRn8s2Yh0AGwyz02qc4xec7hr00hr7skOcK'
+          REACT_APP_PAYPAL_CLIENT_ID: 'AXHIZFFdYRpZNp9uAVmaAeEkTQavEP3xfjjLy7wVA1letAlFOKQ-XpMmxaLVWtNkQx7npwSlDbwAsH_o'
+          REACT_APP_PAYPAL_CLIENT_ID_SANDBOX: 'Ac_5qjkTRBKITOVDzVyasvyO9LYyDvDhe7ZpTd3SSSRat_4go2_O29ncdkYgIh59IX4MPuaKWIH0zixg'
+      - name: Deploy to S3
+        uses: jakejarvis/s3-sync-action@master
+        with:
+          args: --acl public-read --follow-symlinks --delete
+        env:
+          AWS_S3_BUCKET: 'test.seacoo-cn.com'
+          AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          AWS_REGION: 'ca-central-1'
+          SOURCE_DIR: './portal/build'
+
+  deploy_admin_portal:
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: admin_portal
+    steps:
+      - uses: actions/checkout@v2
+      - name: Install
+        run: |
+          yarn install
+      - name: Build
+        run: |
+          yarn build
+        env:
+          REACT_APP_SERVER_URL: 'https://test.api.seacoo.com/'
+      - name: Deploy to S3
+        uses: jakejarvis/s3-sync-action@master
+        with:
+          args: --acl public-read --follow-symlinks --delete
+        env:
+          AWS_S3_BUCKET: 'test.admin.seacoo.com'
+          AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          AWS_REGION: 'ca-central-1' # optional: defaults to us-east-1
+          SOURCE_DIR: './admin_portal/build'

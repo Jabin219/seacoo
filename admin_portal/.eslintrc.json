@@ -1,0 +1,50 @@
+{
+	"env": {
+		"browser": true,
+		"es6": true
+	},
+	"settings": {
+		"react": {
+			"version": "detect"
+		}
+	},
+	"extends": [
+		"eslint:recommended",
+		"plugin:react/recommended",
+		"plugin:@typescript-eslint/eslint-recommended"
+	],
+	"globals": {
+		"Atomics": "readonly",
+		"SharedArrayBuffer": "readonly"
+	},
+	"parser": "@typescript-eslint/parser",
+	"parserOptions": {
+		"ecmaFeatures": {
+			"jsx": true
+		},
+		"ecmaVersion": 2018,
+		"sourceType": "module"
+	},
+	"plugins": ["react", "react-hooks", "@typescript-eslint"],
+	"rules": {
+		"react-hooks/rules-of-hooks": "error",
+		"react-hooks/exhaustive-deps": "error",
+		"no-var": "error",
+		"brace-style": "error",
+		"prefer-template": "error",
+		"radix": "error",
+		"space-before-blocks": "error",
+		"import/prefer-default-export": "off",
+		"no-unused-vars": "off",
+		"@typescript-eslint/no-unused-vars": "error",
+		"func-style": [
+			2,
+			"expression",
+			{
+				"allowArrowFunctions": true
+			}
+		],
+		"eol-last": ["error", "always"],
+		"no-mixed-spaces-and-tabs": "off"
+	}
+}
