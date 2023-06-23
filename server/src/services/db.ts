@@ -2,8 +2,8 @@ import { Pool } from 'pg'
 import { GENERAL_STATUS, ORDER_STATUS } from '../constant'
 
 const procedures: { [key: string]: string } = {
-	// product query
-	getClassifiedProducts: `
+  // product query
+  getClassifiedProducts: `
 	SELECT "Category".*,  ARRAY_TO_JSON(ARRAY_AGG(ROW_TO_JSON(products) ORDER BY products."lastUpdatedAt")) AS "products"
         FROM "Category"
         LEFT JOIN LATERAL (
@@ -33,7 +33,7 @@ const procedures: { [key: string]: string } = {
         ) AS products ON TRUE
         GROUP BY "Category".id
         ORDER BY "Category".priority`,
-	getProducts: `
+  getProducts: `
 	SELECT "Products".*, imgs."images", options."options", comments."comments", subproducts."relatedProducts"
 	FROM "Products"
 	LEFT JOIN LATERAL (
@@ -42,7 +42,7 @@ const procedures: { [key: string]: string } = {
 			WHERE "Images"."productID" = "Products".id
 	) imgs ON TRUE
 	LEFT JOIN LATERAL (
-			SELECT ARRAY_TO_JSON(ARRAY_AGG(JSON_BUILD_OBJECT('id', "id", 'label', "label", 'catalogue', "catalogue", 'priority', "priority", 'price', "price", 'labelZh', "labelZh") ORDER BY "priority" )) AS "options"
+			SELECT ARRAY_TO_JSON(ARRAY_AGG(JSON_BUILD_OBJECT('id', "id", 'label', "label", 'catalogue', "catalogue", 'priority', "priority", 'price', "price", 'labelZh', "labelZh", 'onSale', "onSale") ORDER BY "priority" )) AS "options"
 			FROM "Options"
 			WHERE "Options"."productID" = "Products".id AND "Options"."status" = '${GENERAL_STATUS.ENABLED}'
 	) options ON TRUE
@@ -58,7 +58,7 @@ const procedures: { [key: string]: string } = {
 	) subproducts ON TRUE
 	WHERE "Products".country = $1
 	ORDER BY "Products"."lastUpdatedAt"`,
-	getSpecificProduct: `
+  getSpecificProduct: `
         SELECT "Products".*, imgs."images", options."options", comments."comments", subproducts."relatedProducts"
         FROM "Products"
         LEFT JOIN LATERAL (
@@ -67,7 +67,7 @@ const procedures: { [key: string]: string } = {
                 WHERE "Images"."productID" = "Products".id
         ) imgs ON TRUE
         LEFT JOIN LATERAL (
-                SELECT ARRAY_TO_JSON(ARRAY_AGG(JSON_BUILD_OBJECT('id', "id", 'label', "label", 'catalogue', "catalogue", 'priority', "priority", 'price', "price"))) AS "options"
+                SELECT ARRAY_TO_JSON(ARRAY_AGG(JSON_BUILD_OBJECT('id', "id", 'label', "label", 'catalogue', "catalogue", 'priority', "priority", 'price', "price", 'onSale', "onSale"))) AS "options"
                 FROM "Options"
                 WHERE "Options"."productID" = "Products".id AND "Options"."status" = '${GENERAL_STATUS.ENABLED}'
         ) options ON TRUE
@@ -82,11 +82,11 @@ const procedures: { [key: string]: string } = {
         	WHERE "Relations"."productID" = "Products".id
         ) subproducts ON TRUE
         WHERE "Products".id = $1 ; `,
-	getProductPrice: `
+  getProductPrice: `
         SELECT "Products"."price", "Products"."id"
         FROM "Products"
         WHERE "Products"."id" = $1 ; `,
-	getBechePowder: `
+  getBechePowder: `
 		SELECT "Products".*, images."images"
 		FROM "Products"
 		LEFT JOIN LATERAL (
@@ -96,7 +96,7 @@ const procedures: { [key: string]: string } = {
         ) images ON TRUE
 		WHERE "Products".id = '7f87ea9b-c652-40ad-82f4-17db00ce3542'
 	`,
-	retrieveOrderProduct: `
+  retrieveOrderProduct: `
         SELECT "Products".id, "Options".id as "selectedOption", "Products"."taxable", "Products".name, COALESCE("coverImage", "Images".url) AS "coverImage", "Options".label AS "shortDescription", COALESCE("Options".price, "Products".price) AS "price","Options"."labelZh" AS "shortDescriptionZh", "Products"."nameZh"
         FROM "Products"
         LEFT JOIN "Images" ON "Images"."productID" = "Products".id
@@ -104,20 +104,20 @@ const procedures: { [key: string]: string } = {
         WHERE "Products"."id" = $2
         ORDER BY "Images".priority ASC
         LIMIT 1; `,
-	newAddress: `
+  newAddress: `
         INSERT INTO "Addresses" ("country", "province", "city", "street", "postalCode", "recipient", "phone")
         VALUES ($1, $2, $3, $4, $5, $6, $7)
         RETURNING "id"; `,
-	// order query
-	newOrder: `
+  // order query
+  newOrder: `
         INSERT INTO "Orders" ("orderNumber", "subtotal", "tax", "couponID", "shippingFee", "totalPrice", "email", "shippingAddress", "billingAddress", "paymentMethod", "domain", "status")
         VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, '${ORDER_STATUS.UNPAID}' )
         RETURNING "id", "createdAt"; `,
-	newOrderDetail: `
+  newOrderDetail: `
         INSERT INTO "OrderDetail" ("orderID", "price", "productID", "amount", "optionID")
         VALUES ($1, $2, $3, $4, $5)
         RETURNING "id"; `,
-	getOrderWithDetailsById: `
+  getOrderWithDetailsById: `
         SELECT "Orders".*, ROW_TO_JSON("Addresses") AS "addressShipping", ARRAY_TO_JSON(ARRAY_AGG(ROW_TO_JSON(orderDetail))) AS "products"
         FROM "Orders", "Addresses",
         LATERAL (
@@ -130,73 +130,73 @@ const procedures: { [key: string]: string } = {
         ) orderDetail
         WHERE "Orders".id = $1 AND "Addresses".id = "Orders"."shippingAddress"
 		GROUP BY "Orders".id, "Addresses".id;`,
-	getOrderById: `
+  getOrderById: `
 		SELECT *
 		FROM "Orders"
 		WHERE "Orders".id = $1`,
-	getOrderByAdapayId: `
+  getOrderByAdapayId: `
 		SELECT *
 		FROM "Orders"
 		WHERE "Orders"."adapayId" = $1
 	`,
-	updateOrderToPaid: `
+  updateOrderToPaid: `
         UPDATE "Orders"
         SET "status" = '${ORDER_STATUS.PAID}'
         WHERE "id" = $1`,
-	updateOrderToUnpaid: `
+  updateOrderToUnpaid: `
         UPDATE "Orders"
         SET "status" = '${ORDER_STATUS.UNPAID}'
         WHERE "id" = $1`,
-	updateOrderToCancelled: `
+  updateOrderToCancelled: `
         UPDATE "Orders"
         SET "status" = '${ORDER_STATUS.CANCELLED}'
         WHERE "id" = $1`,
-	updateOrderToDelivered: `
+  updateOrderToDelivered: `
         UPDATE "Orders"
         SET "status" = '${ORDER_STATUS.DELIVERED}'
         WHERE "id" = $1`,
-	updateShippedOrder: `
+  updateShippedOrder: `
 		UPDATE "Orders"
 		SET "status" = '${ORDER_STATUS.SHIPPED}'
 		WHERE "id" = $1`,
-	updateOrderPaymentMethod: `
+  updateOrderPaymentMethod: `
 		UPDATE "Orders"
 		SET "paymentMethod"=$2
 		WHERE "id" = $1
 	`,
-	getStoreOrderResult: `
+  getStoreOrderResult: `
 		SELECT "Orders".id, "Orders"."orderNumber", "Orders".email, "Orders"."totalPrice", "Orders"."domain"
 		FROM "Orders"
 		WHERE id = $1
 	`,
-	createNewTransaction: `
+  createNewTransaction: `
 		INSERT INTO "Transactions" ("orderID")
 		VALUES ($1)
 		RETURNING "id"
 	`,
-	findOrderIdByTransactionId: `
+  findOrderIdByTransactionId: `
 		SELECT "Transactions"."orderID"
 		FROM "Transactions"
 		WHERE id = $1
 	`,
-	updateTransactionToPaid: `
+  updateTransactionToPaid: `
 		UPDATE "Transactions"
 		SET status='paid'
 		WHERE id = $1
 	`,
-	updateOrderAdapayId: `
+  updateOrderAdapayId: `
 		update "Orders"
 		set "adapayId"=$2
 		where id=$1
 	`,
-	getPaidTransactionId: `
+  getPaidTransactionId: `
 		select "Transactions".id
 		from "Transactions"
 		where "orderID"=$1
 		and status='paid'
 	`,
-	// coupon query
-	findCoupon: `
+  // coupon query
+  findCoupon: `
         SELECT *
         FROM "Coupons"
         WHERE ("code" = $1::VARCHAR OR "id"::VARCHAR = $1)
@@ -206,55 +206,55 @@ const procedures: { [key: string]: string } = {
 		AND "domain" = $3
 		AND "numberOfUse">0
 		`,
-	findUsedCoupon: `SELECT *
+  findUsedCoupon: `SELECT *
         FROM "Coupons"
         WHERE ("code" = $1::VARCHAR OR "id"::VARCHAR = $1); `,
-	createCoupon: `
+  createCoupon: `
         INSERT INTO "Coupons" ("code", "promotion", "discount", "status", "comment", "numberOfUse", "expireTime", "startTime","domain")
         VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9)
         RETURNING * ; `,
-	disableCoupon: `
+  disableCoupon: `
         UPDATE "Coupons"
         SET "status" = '${GENERAL_STATUS.DISABLED}'
         WHERE "code" = $1::VARCHAR OR "id"::VARCHAR = $1
         RETURNING * ; `,
-	enableCoupon: `
+  enableCoupon: `
         UPDATE "Coupons"
         SET "status" = '${GENERAL_STATUS.ENABLED}'
 		WHERE "code" = $1::VARCHAR OR "id"::VARCHAR = $1; `,
-	decreaseCouponNumberOfUse: `
+  decreaseCouponNumberOfUse: `
 		UPDATE "Coupons"
 		SET "numberOfUse" = "numberOfUse"-1
 		WHERE "code" = $1::VARCHAR OR "id"::VARCHAR = $1; `,
-	newMail: `
+  newMail: `
 		INSERT INTO "Mails" ("name", "email", "content")
 		VALUES ($1, $2, $3)
 	`,
-	getAllMails: `
+  getAllMails: `
 		SELECT *
 		FROM "Mails"
 		ORDER BY "createdAt" DESC
 	`,
-	newSubscription: `
+  newSubscription: `
 		INSERT INTO "Subscriptions" ("email")
 		VALUES ($1)
 		RETURNING "id"
 	`,
-	checkExistedEmail: `
+  checkExistedEmail: `
 		SELECT *
 		FROM "Subscriptions"
 		WHERE "email" = $1
 	`,
-	addSubscriptionCoupon: `
+  addSubscriptionCoupon: `
 		UPDATE "Subscriptions"
 		SET "coupon" = $2
 		WHERE "id" = $1
 	`,
-	getAccountInfo: `
+  getAccountInfo: `
         SELECT "Account"."hashedPassword", "Account"."id"
         FROM "Account"
         WHERE "Account"."userName" = $1; `,
-	adminGetOrders: `
+  adminGetOrders: `
 		SELECT "Orders".id, email, "Orders"."orderNumber", "orderDetail", "Orders".status, "Orders".subtotal, "Orders".tax, "Orders"."shippingFee", "Orders"."totalPrice", "Orders"."paymentMethod", domain, coupon, row_to_json("Addresses") AS "shippingAddress", "Orders"."createdAt"
 		FROM "Orders", "Addresses",
 		LATERAL(
@@ -297,7 +297,7 @@ const procedures: { [key: string]: string } = {
 		Limit 11
 		offset $5
 	`,
-	adminGetUnshippedOrders: `
+  adminGetUnshippedOrders: `
 		SELECT "Orders".id, email, "Orders"."orderNumber", "orderDetail", "Orders".status, "Orders".subtotal, "Orders".tax, "Orders"."shippingFee", "Orders"."totalPrice", "Orders"."paymentMethod", domain, coupon,  row_to_json("Addresses") AS "shippingAddress", "Orders"."createdAt"
 		FROM "Orders", "Addresses",
 		LATERAL(
@@ -332,7 +332,7 @@ const procedures: { [key: string]: string } = {
 		AND "Orders".status='paid'
 		ORDER BY "createdAt" ASC
 		`,
-	adminGetProducts: `
+  adminGetProducts: `
 	SELECT id, "coverImage", "nameZh" as "productName", price, taxable, stock, status, options."options", country
 	FROM "Products"
 	LEFT JOIN LATERAL (
@@ -342,17 +342,17 @@ const procedures: { [key: string]: string } = {
 	) options ON TRUE
 	ORDER BY "Products"."lastUpdatedAt"
 	`,
-	adminUpdateProductTaxable: `
+  adminUpdateProductTaxable: `
         UPDATE "Products"
         SET "taxable" =  $1
         WHERE "id" = $2
 		RETURNING id, "coverImage", "nameZh" as "productName", price, taxable, stock, status, country`,
-	adminUpdateProductStatus: `
+  adminUpdateProductStatus: `
         UPDATE "Products"
         SET "status" =  $1, "statusDescription" = $2, "statusDescriptionZh" = $3
         WHERE "id" = $4
         RETURNING id, "coverImage", "nameZh" as "productName", price, taxable, stock, status, country`,
-	adminGetCouponsWithOrders: `
+  adminGetCouponsWithOrders: `
 		Select *
 		from "Coupons",
 		Lateral (
@@ -372,38 +372,38 @@ const procedures: { [key: string]: string } = {
         Limit 21
         offset $1
 		`,
-	adminUpdateProductPrice: `
+  adminUpdateProductPrice: `
 			UPDATE "Products"
 			SET "price" = $1
 			WHERE "id" = $2
 			RETURNING id, "coverImage", "nameZh" as "productName", price, taxable, stock, status, country
 		`,
-	adminUpdateProductOptionPrice: `
+  adminUpdateProductOptionPrice: `
 		UPDATE "Options"
 		SET "price" = $1
 		WHERE "productID" = $2
 		AND "id" = $3
 		RETURNING id, label, price
 	`,
-	adminGetAllSubscriptionEmails: `
+  adminGetAllSubscriptionEmails: `
 		SELECT "Subscriptions"."email"
 		FROM "Subscriptions"
 	`
 }
 
 const query = async (key: string, value: string[]) => {
-	const pool = new Pool({
-		user: process.env.DB_USER,
-		host: process.env.DB_HOST,
-		database: process.env.DB_NAME,
-		password: process.env.DB_PASSWORD,
-		port: Number(process.env.DB_PORT)
-	})
+  const pool = new Pool({
+    user: process.env.DB_USER,
+    host: process.env.DB_HOST,
+    database: process.env.DB_NAME,
+    password: process.env.DB_PASSWORD,
+    port: Number(process.env.DB_PORT)
+  })
 
-	const query = procedures[key]
+  const query = procedures[key]
 
-	const result = await pool.query(query, value)
-	return { count: result.rowCount, data: result.rows }
+  const result = await pool.query(query, value)
+  return { count: result.rowCount, data: result.rows }
 }
 
 export default query
